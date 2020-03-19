@@ -112,28 +112,32 @@ node_identifier = str(uuid4()).replace('-', '')
 blockchain = Blockchain()
 
 
-@app.route('/mine', methods=['POST', 'GET'])
+@app.route('/mine', methods=['POST'])
 def mine():
     data = request.get_json()
-    print(data)
-    if data is None or "proof" not in data and "id" not in data:
+
+    req_params = ['proof', 'id']
+    if not all(k in data for k in req_params):
         response = {
             'message': 'Missing required fields.'
         }
         return jsonify(response), 400
 
-    blk = blockchain.last_block
+    proof_sent = data['proof']
 
-    if blockchain.valid_proof(data['id'], data['proof']):
-        blk_hash = blockchain.hash(blk)
-        blockchain.new_block(data['proof'], blk_hash)
+    blk_str = json.dumps(blockchain.last_block, sort_keys=True)
 
+    is_proof_valid = blockchain.valid_proof(blk_str, proof_sent)
+
+    if is_proof_valid:
+        previous_hash = blockchain.hash(blockchain.last_block)
+        new_blk = blockchain.new_block(proof_sent, previous_hash)
         response = {
             'message': 'Great Success! Forged a new proof.'
         }
         return jsonify(response), 200
     else:
-        return jsonify({'message': 'Massive Failure! Unsuccessful.'}), 200
+        return jsonify({'message': 'Invalid Proof. Unsuccessful Try again.'}), 200
 
 
 @app.route('/chain', methods=['GET'])
@@ -149,13 +153,13 @@ def full_chain():
 @app.route('/last_block', methods=['GET'])
 def last_block_in_chain():
     # last block in chain
-    last_blk = blockchain.chain[-1]
+    last_block = blockchain.chain[-1]
     response = {
-        'last_block': last_blk
+        'last_block': last_block
     }
     return jsonify(response), 200
 
 
 # Run the program on port 5000
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5051)
+    app.run(host='0.0.0.0', port=5000)

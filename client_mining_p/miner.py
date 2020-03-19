@@ -40,17 +40,17 @@ def valid_proof(block_string, proof):
     return hash_guess[:6] == '000000'
 
 
-coin_mined = 0
-
 if __name__ == '__main__':
     # What is the server address? IE `python3 miner.py https://server.com/api/`
     if len(sys.argv) > 1:
         node = sys.argv[1]
     else:
-        node = "http://localhost:5051"
+        node = "http://localhost:5000"
+
+    coin_mined = 0
 
     # Load ID
-    f = open("my_id.txt", "r")
+    f = open("client_mining_p/my_id.txt", mode="r")
     id = f.read()
     print("ID is", id)
     f.close()
@@ -59,17 +59,20 @@ if __name__ == '__main__':
     while True:
         r = requests.get(url=node + "/last_block")
         # # Handle non-json response
-        # try:
-        data = r.json()
-        # except ValueError:
-        #     print("Error:  Non-json response")
-        #     print("Response returned:")
-        #     print(r)
-        #     break
+        try:
+            data = r.json()
+        except ValueError:
+            print("Error:  Non-json response")
+            print("Response returned:")
+            print(r)
+            break
 
         # Get the block from `data` and use it to look for a new proof
         # new_proof = ???
-        new_proof = proof_of_work(data['last_block'])
+        last_block = data.get('last_block')
+        print('Looking for proof of work')
+        new_proof = proof_of_work(last_block)
+        print(f'Found Proof: {new_proof}')
 
         # When found, POST it to the server {"proof": new_proof, "id": id}
         post_data = {"proof": new_proof, "id": id}
@@ -82,6 +85,6 @@ if __name__ == '__main__':
         # print the message from the server.
         if data['message'] == 'Great Success! Forged a new proof.':
             coin_mined += 1
-            print(coin_mined)
+            print(f'You have received {coin_mined} coin(s) for mining!')
         else:
             print(data['message'])
