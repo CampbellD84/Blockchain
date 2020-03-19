@@ -50,7 +50,7 @@ if __name__ == '__main__':
     coin_mined = 0
 
     # Load ID
-    f = open("client_mining_p/my_id.txt", mode="r")
+    f = open("my_id.txt", mode="r")
     id = f.read()
     print("ID is", id)
     f.close()
@@ -83,7 +83,7 @@ if __name__ == '__main__':
         # TODO: If the server responds with a 'message' 'New Block Forged'
         # add 1 to the number of coins mined and print it.  Otherwise,
         # print the message from the server.
-        if data['message'] == 'Great Success! Forged a new proof.':
+        if data['message'] == 'Great Success!':
             coin_mined += 1
             print(f'You have received {coin_mined} coin(s) for mining!')
         else:
