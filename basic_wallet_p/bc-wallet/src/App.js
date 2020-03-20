@@ -1,13 +1,19 @@
-import React from "react";
-import TransactionForm from "./TransactionForm";
+import React, { useState } from "react";
+import Form from "./Form";
+import Transactions from "./Transactions";
 import "./App.css";
+import BCContext from "./WalletContext";
 
 function App() {
+  const [state, setState] = useState({ id: "" });
+
   return (
     <div className="App">
-      <h1>Welcome to SimpWallet</h1>
-      <h3>Please enter information to make a transaction.</h3>
-      <TransactionForm />
+      <BCContext.Provider value={{ state, setState }}>
+        <h1>Welcome to SimpWallet</h1>
+        <h3>Please enter information.</h3>
+        {state.id === "" ? <Form /> : <Transactions />}
+      </BCContext.Provider>
     </div>
   );
 }
