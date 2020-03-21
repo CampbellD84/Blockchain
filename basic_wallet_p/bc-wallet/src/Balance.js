@@ -3,7 +3,7 @@ import API from "./API";
 
 import BCContext from "./WalletContext";
 
-export default function Transactions() {
+export default function Balance() {
   const cntx = useContext(BCContext);
 
   const getUserTrans = (chain, id) => {
